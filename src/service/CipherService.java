@@ -20,9 +20,9 @@ public class CipherService {
 
     public String applyCipher(int key, boolean failOnUnknown) {
         ShiftCharService shiftCharService = new ShiftCharService();
-        String originalText = directoryService.readText(directory.getInputFile()).toLowerCase();
+        String originalText = directoryService.readText(directory.getInputFile());
         StringBuilder stringBuilder = new StringBuilder();
-        char[] cipherArray = originalText.toCharArray();
+        char[] cipherArray = originalText.toLowerCase().toCharArray();
 
         for (int i = 0; i < cipherArray.length; i++) {
             char textCharacter = cipherArray[i];
