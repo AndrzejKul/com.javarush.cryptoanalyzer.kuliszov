@@ -2,36 +2,38 @@ import constants.Alphabet;
 
 import constants.UserCommands;
 import data.Directory;
-import encryptions.Bruteforce;
-import encryptions.Cipher;
-import encryptions.Encryption;
+import exceptions.RuntimeIOException;
+import exceptions.UserInputException;
+import service.BruteforceService;
+import service.CipherService;
 import service.IOService;
 
 import java.util.Scanner;
 
 public class Main {
 
-    private final static Cipher encrypter = ((key, iterator) -> iterator + key > Alphabet.ALPHABET.length - 1 ?
-            Math.abs(Alphabet.ALPHABET.length - (iterator + key)) : iterator + key);
-
-    private final static Cipher decrypter = ((key, iterator) -> iterator - key < 0 ?
-            Math.abs(Alphabet.ALPHABET.length + (iterator - key)) : iterator - key);
-
-
     public static void main(String[] args) {
 
         do {
-           switch (getUserCommand()){
-               case EXIT: return;
-               case ENCRYPT: doEncrypt();
-                   break;
-               case DECRYPT: doDecrypt();
-                   break;
-               case BRUTEFORCE: doBruteForce();
-                   break;
-               case UNKNOWN:
-                   System.out.println("Неизвестная команда!");
-           }
+            try {
+                switch (getUserCommand()) {
+                    case EXIT:
+                        return;
+                    case ENCRYPT:
+                        doEncrypt();
+                        break;
+                    case DECRYPT:
+                        doDecrypt();
+                        break;
+                    case BRUTEFORCE:
+                        doBruteForce();
+                        break;
+                    case UNKNOWN:
+                        System.out.println("Неизвестная команда!");
+                }
+            } catch (RuntimeException exception){
+                System.out.println("Произошла ошибка: " + exception.getMessage());
+            }
         } while (true);
 
     }
@@ -46,41 +48,54 @@ public class Main {
         if (!scanner.hasNextInt()) {
             return UserCommands.UNKNOWN;
         }
-        switch (scanner.nextInt()){
-            case 1: return UserCommands.ENCRYPT;
-            case 2: return UserCommands.DECRYPT;
-            case 3: return UserCommands.BRUTEFORCE;
-            case 4: return UserCommands.EXIT;
-            default: return UserCommands.UNKNOWN;
+        switch (scanner.nextInt()) {
+            case 1:
+                return UserCommands.ENCRYPT;
+            case 2:
+                return UserCommands.DECRYPT;
+            case 3:
+                return UserCommands.BRUTEFORCE;
+            case 4:
+                return UserCommands.EXIT;
+            default:
+                return UserCommands.UNKNOWN;
         }
     }
 
-    private static void doEncrypt (){
+    private static void doEncrypt() {
         IOService ioService = new IOService();
         Directory directory = ioService.initDirectory();
         int keyUser = getKeyFromUser();
-        Encryption encrypt = new Encryption(directory);
-        encrypt.encryption(keyUser, encrypter);
+        CipherService encrypt = new CipherService(directory);
+        encrypt.applyCipher(keyUser, false);
+        System.out.println("Операция прошла успешно");
+        System.out.println("-----------------------");
     }
 
-    private static void doDecrypt (){
+    private static void doDecrypt() {
         IOService ioService = new IOService();
         Directory directory = ioService.initDirectory();
         int keyUser = getKeyFromUser();
-        Encryption encrypt = new Encryption(directory);
-        encrypt.encryption(keyUser, decrypter);
+        CipherService encrypt = new CipherService(directory);
+        encrypt.applyCipher(-keyUser, true);
+        System.out.println("Операция прошла успешно");
+        System.out.println("-----------------------");
     }
 
-    private static void doBruteForce (){
+    private static void doBruteForce() {
         IOService ioService = new IOService();
         Directory directory = ioService.initDirectory();
-        Bruteforce bruteforce = new Bruteforce(directory);
-        bruteforce.doBruteforce(decrypter);
+        BruteforceService bruteforceService = new BruteforceService(directory);
+        bruteforceService.doBruteforce();
     }
 
-    private static int getKeyFromUser (){
+    private static int getKeyFromUser() {
         System.out.println("Введите ключ шифрования: ");
-        int keyUser = new Scanner(System.in).nextInt();
+        Scanner scanner = new Scanner(System.in);
+        if (!scanner.hasNextInt()) {
+            throw new UserInputException("При вводе ключа вы ввели не число");
+        }
+        int keyUser = scanner.nextInt();
         return keyUser;
     }
 }
