@@ -1,21 +1,14 @@
 package service;
 
-import constants.Alphabet;
 import data.Directory;
-
-import java.util.List;
 
 public class CipherService {
     private final Directory directory;
     private final DirectoryService directoryService;
 
-    public CipherService(Directory directory){
+    public CipherService(Directory directory, IOService ioService) {
         this.directory = directory;
-        this.directoryService = new DirectoryService();
-    }
-
-    public Directory getDirectory() {
-        return directory;
+        this.directoryService = new DirectoryService(ioService);
     }
 
     public String applyCipher(int key, boolean failOnUnknown) {

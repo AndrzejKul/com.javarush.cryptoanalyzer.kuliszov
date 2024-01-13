@@ -1,30 +1,30 @@
 package service;
 
-import data.Directory;
+import exceptions.ExitException;
 
-import java.io.File;
 import java.util.Scanner;
 
 public class IOService {
 
-    public Directory initDirectory() {
-        File inputFile;
-        File outputFile;
-        boolean firstTry = true;
-        Scanner scanner = new Scanner(System.in);
-        do {
-            if(firstTry){
-                System.out.println("Укажите путь к файлу: ");
-            } else {
-                System.out.println("Файл не найден, введите верный адрес: ");
-            }
-            String fileName = scanner.nextLine();
-            inputFile = new File(fileName);
-            firstTry = false;
-        } while ((!inputFile.isFile()));
-        System.out.println("Укажите адрес создания нового файла: ");
-        outputFile = new File(scanner.nextLine());
-        return new Directory(inputFile, outputFile);
+    public String getText() {
+        return checkForExit(new Scanner(System.in).nextLine());
     }
+
+    public Integer getInt() {
+        Scanner scanner = new Scanner(System.in);
+        if (scanner.hasNextInt()) {
+            return scanner.nextInt();
+        }
+        checkForExit(scanner.nextLine());
+        return null;
+    }
+
+    public String checkForExit(String userInput) {
+        if (userInput.equalsIgnoreCase("exit")) {
+            throw new ExitException();
+        }
+        return userInput;
+    }
+
 
 }

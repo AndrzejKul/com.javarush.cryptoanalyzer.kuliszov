@@ -1,10 +1,17 @@
 package service;
 
+import data.Directory;
 import exceptions.RuntimeIOException;
 
 import java.io.*;
 
 public class DirectoryService {
+    private final IOService ioService;
+
+    public DirectoryService(IOService ioService) {
+        this.ioService = ioService;
+    }
+
     public String readText(File inputFile) {
 
         String resultText = "";
@@ -26,6 +33,25 @@ public class DirectoryService {
         } catch (IOException exception) {
             throw new RuntimeIOException("Ошибка записи файла");
         }
+    }
+
+    public Directory initDirectory() {
+        File inputFile;
+        File outputFile;
+        boolean firstTry = true;
+        do {
+            if (firstTry) {
+                System.out.println("Укажите путь к файлу: ");
+            } else {
+                System.out.println("Файл не найден, введите верный адрес: ");
+            }
+            String fileName = ioService.getText();
+            inputFile = new File(fileName);
+            firstTry = false;
+        } while ((!inputFile.isFile()));
+        System.out.println("Укажите адрес создания нового файла: ");
+        outputFile = new File(ioService.getText());
+        return new Directory(inputFile, outputFile);
     }
 
 }
